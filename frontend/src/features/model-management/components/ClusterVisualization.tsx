@@ -26,12 +26,14 @@ export const ClusterVisualization = () => {
   const chartRef = useRef<Chart<"scatter"> | null>(null);
 
   useEffect(() => {
-    // 🔥 Si hay un gráfico previo, lo destruimos ANTES de renderizar uno nuevo
-    if (chartRef.current) {
-      chartRef.current.destroy();
-      chartRef.current = null;
-    }
-  }, [clusterData]); // Se ejecuta CADA VEZ que cambie el clusterData
+    return () => {
+      // Limpieza solo al desmontar el componente
+      if (chartRef.current) {
+        chartRef.current.destroy();
+        chartRef.current = null;
+      }
+    };
+  }, []);
 
   if (isLoading)
     return <div className="loading">Cargando visualización...</div>;
@@ -40,12 +42,12 @@ export const ClusterVisualization = () => {
 
   const clusters = [...new Set(clusterData.points.map((p) => p.label))];
   const colors = [
-    "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
+    "#FF5733",
+    "#33FF33",
+    "#F633FF",
     "#4BC0C0",
     "#9966FF",
-    "#FF9F40",
+    "#FFE333",
     "#8AC24A",
     "#607D8B",
     "#E91E63",

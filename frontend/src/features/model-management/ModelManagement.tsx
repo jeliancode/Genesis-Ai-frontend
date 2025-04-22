@@ -15,28 +15,19 @@ export const ModelManagement = () => {
     error,
   } = useDocuments();
 
-  const handleClassificationSubmit = async (file: File | null) => {
+  const onUpload = async (file: File | null, mode: "classify" | "infer") => {
     if (!file) return;
     try {
-      await handleClassificationUpload(file);
+      if (mode === "classify") {
+        await handleClassificationUpload(file);
+      } else {
+        await handleInferenceUpload(file);
+      }
       await refreshClusterData();
+      setShowClusters(true);
     } catch (err) {
-      console.error("Error en clasificación:", err);
+      console.error(`Error en ${mode}:`, err);
     }
-  };
-
-  const handleInferenceSubmit = async (file: File | null) => {
-    if (!file) return;
-    try {
-      await handleInferenceUpload(file);
-      await refreshClusterData();
-    } catch (err) {
-      console.error("Error en inferencia:", err);
-    }
-  };
-
-  const handleViewDocuments = () => {
-    setShowClusters(!showClusters);
   };
 
   return (
@@ -44,13 +35,12 @@ export const ModelManagement = () => {
       <div className="upload-sections">
         <FileUploader
           title="Subir documento con el modelo de clasificación"
-          onSubmit={handleClassificationSubmit}
+          onSubmit={(f) => onUpload(f, "classify")}
           isLoading={isLoading}
         />
-
         <FileUploader
           title="Subir documento con inferencia"
-          onSubmit={handleInferenceSubmit}
+          onSubmit={(f) => onUpload(f, "infer")}
           isLoading={isLoading}
         />
 
@@ -58,16 +48,18 @@ export const ModelManagement = () => {
 
         <div className="view-documents-section">
           <button
-            onClick={handleViewDocuments}
+            onClick={() => setShowClusters((v) => !v)}
             className="view-button"
             disabled={isLoading}
           >
             {showClusters ? "Ocultar documentos" : "Ver documentos"}
           </button>
 
-          <div className="documents-list">
-            {showClusters && <ClusterVisualization />}
-          </div>
+          {showClusters && (
+            <div className="documents-list">
+              <ClusterVisualization />
+            </div>
+          )}
         </div>
       </div>
     </div>
