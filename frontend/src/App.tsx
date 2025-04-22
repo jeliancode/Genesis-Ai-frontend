@@ -13,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/files" element={<ModelManagement />} />
           <Route path="/chat" element={<ChatView />} />
-          <Route path="*" element={<ChatView />} /> {/* Ruta por defecto */}
+          <Route path="*" element={<ChatView />} />
         </Routes>
       </div>
     </BrowserRouter>

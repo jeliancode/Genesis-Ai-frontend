@@ -1,73 +1,75 @@
 import { useState } from "react";
-import { Role } from "../../types/roleManagement";
 import { FileUploader } from "../../components/common/FileUploader";
-import { RoleMenu } from "../../components/common/RoleMenu";
+import { ClusterVisualization } from "./components/ClusterVisualization";
+import { useDocuments } from "./hooks/useDocuments";
+import { useCluster } from "./hooks/useClusters";
+import "@/styles/modelManagement.css";
 
 export const ModelManagement = () => {
-  const [currentRole, setCurrentRole] = useState<Role>("ADMIN");
+  const [showClusters, setShowClusters] = useState(false);
+  const { refreshClusterData } = useCluster();
+  const {
+    handleInferenceUpload,
+    handleClassificationUpload,
+    isLoading,
+    error,
+  } = useDocuments();
 
-  const [classificationFile, setClassificationFile] = useState<File | null>(
-    null
-  );
-  const [inferenceFile, setInferenceFile] = useState<File | null>(null);
-
-  const handleClassificationSubmit = () => {
-    if (currentRole !== "ADMIN") return;
-    console.log("Classification file submitted:", classificationFile);
-    // Lógica para subir el archivo de clasificación
+  const handleClassificationSubmit = async (file: File | null) => {
+    if (!file) return;
+    try {
+      await handleClassificationUpload(file);
+      await refreshClusterData();
+    } catch (err) {
+      console.error("Error en clasificación:", err);
+    }
   };
 
-  const handleInferenceSubmit = () => {
-    if (currentRole !== "ADMIN") return;
-    console.log("Inference file submitted:", inferenceFile);
-    // Lógica para subir el archivo de inferencia
+  const handleInferenceSubmit = async (file: File | null) => {
+    if (!file) return;
+    try {
+      await handleInferenceUpload(file);
+      await refreshClusterData();
+    } catch (err) {
+      console.error("Error en inferencia:", err);
+    }
   };
 
   const handleViewDocuments = () => {
-    console.log("View documents clicked");
-    // Lógica para mostrar documentos
+    setShowClusters(!showClusters);
   };
-
-  const adminContent = (
-    <>
-      <FileUploader
-        title="Subir documento con el modelo de clasificación"
-        onFileChange={setClassificationFile}
-        onSubmit={handleClassificationSubmit}
-      />
-
-      <FileUploader
-        title="Subir documento con inferencia"
-        onFileChange={setInferenceFile}
-        onSubmit={handleInferenceSubmit}
-      />
-    </>
-  );
 
   return (
     <div className="model-management-container">
       <div className="upload-sections">
-        {currentRole === "ADMIN" ? (
-          adminContent
-        ) : (
-          <div className="access-denied">
-            <h3>Acceso restringido</h3>
-            <p>Solo usuarios ADMIN pueden acceder a esta funcionalidad</p>
-          </div>
-        )}
+        <FileUploader
+          title="Subir documento con el modelo de clasificación"
+          onSubmit={handleClassificationSubmit}
+          isLoading={isLoading}
+        />
+
+        <FileUploader
+          title="Subir documento con inferencia"
+          onSubmit={handleInferenceSubmit}
+          isLoading={isLoading}
+        />
+
+        {error && <div className="error-message">{error}</div>}
 
         <div className="view-documents-section">
-          <button onClick={handleViewDocuments} className="view-button">
-            Ver documentos
+          <button
+            onClick={handleViewDocuments}
+            className="view-button"
+            disabled={isLoading}
+          >
+            {showClusters ? "Ocultar documentos" : "Ver documentos"}
           </button>
-          <div className="documents-list"></div>
+
+          <div className="documents-list">
+            {showClusters && <ClusterVisualization key={Date.now()} />}
+          </div>
         </div>
       </div>
-      <RoleMenu
-        onRoleChange={setCurrentRole}
-        initialRole="ADMIN"
-        allowRoleChange={false}
-      />
     </div>
   );
 };

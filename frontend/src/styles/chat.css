@@ -134,3 +134,56 @@
   margin-top: 1rem;
   color: rgba(255, 255, 255, 0.7);
 }
+
+.message {
+  padding: 0.8rem 1.2rem;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  max-width: 80%;
+}
+
+.user-message {
+  background-color: rgba(100, 108, 255, 0.2);
+  align-self: flex-end;
+}
+
+.bot-message {
+  background-color: rgba(255, 71, 71, 0.2);
+  align-self: flex-start;
+}
+
+.message-text {
+  margin-bottom: 0.5rem;
+}
+
+.search-results {
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.search-results h4 {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.search-results ul {
+  padding-left: 1rem;
+  margin: 0;
+}
+
+.search-results li {
+  margin-bottom: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error {
+  color: #ff4747;
+  padding: 2rem;
+  text-align: center;
+}

@@ -1,32 +1,8 @@
-import { useState } from "react";
-import { Role } from "../../types/roleManagement";
-import { RoleMenu } from "../../components/common/RoleMenu";
+import { useChat } from "./hooks/useChat";
 import { ChatInput } from "./components/ChatInput";
-import "../../styles/chat.css";
 
 export const ChatView = () => {
-  const [currentRole, setCurrentRole] = useState<Role>("USER");
-  const [messages, setMessages] = useState<
-    Array<{
-      text: string;
-      isBot: boolean;
-    }>
-  >([]);
-
-  const handleSendMessage = (message: string) => {
-    if (message.trim()) {
-      setMessages([
-        ...messages,
-        {
-          text: message,
-          isBot: currentRole === "ADMIN",
-        },
-      ]);
-      console.log(`Mensaje enviado como ${currentRole}:`, message);
-    }
-  };
-
-  const showAdminFeatures = currentRole === "ADMIN";
+  const { handleSendMessage, chatHistory, isLoading } = useChat();
 
   return (
     <div className="chat-container">
@@ -34,34 +10,38 @@ export const ChatView = () => {
         <div className="welcome-message">
           <h2>Hola! Soy Genesis, tu terapeuta personal!</h2>
           <p>En qué puedo ayudarte...</p>
-          {showAdminFeatures && (
-            <div className="admin-badge">Modo Administrador</div>
-          )}
         </div>
 
         <div className="messages-container">
-          {messages.map((msg, index) => (
+          {chatHistory.map((item, index) => (
             <div
               key={index}
-              className={`message ${msg.isBot ? "bot-message" : "user-message"}`}
+              className={`message ${item.isUser ? "user-message" : "bot-message"}`}
             >
-              {msg.text}
-              {msg.isBot && <span className="admin-tag"> (Admin)</span>}
+              <div className="message-text">{item.message}</div>
+              {item.results && (
+                <div className="search-results">
+                  <h4>Documentos relevantes:</h4>
+                  <ul>
+                    {item.results.slice(0, 3).map((doc, i) => (
+                      <li key={i}>
+                        <strong>{doc.title}</strong> - {doc.category}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
+          {isLoading && (
+            <div className="message bot-message">
+              <div className="message-text">Procesando tu consulta...</div>
+            </div>
+          )}
         </div>
 
-        <ChatInput
-          onSendMessage={handleSendMessage}
-          showAdminControls={showAdminFeatures}
-        />
+        <ChatInput onSendMessage={handleSendMessage} />
       </div>
-
-      <RoleMenu
-        onRoleChange={setCurrentRole}
-        initialRole="USER"
-        allowRoleChange={true}
-      />
     </div>
   );
 };
