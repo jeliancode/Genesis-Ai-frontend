@@ -66,7 +66,7 @@ export const ModelManagement = () => {
           </button>
 
           <div className="documents-list">
-            {showClusters && <ClusterVisualization key={Date.now()} />}
+            {showClusters && <ClusterVisualization />}
           </div>
         </div>
       </div>

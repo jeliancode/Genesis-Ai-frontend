@@ -25,15 +25,13 @@ export const ClusterVisualization = () => {
   const { clusterData, isLoading, error } = useCluster();
   const chartRef = useRef<Chart<"scatter"> | null>(null);
 
-  // Limpieza previa del gráfico para evitar el error de canvas en uso
   useEffect(() => {
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
-        chartRef.current = null;
-      }
-    };
-  }, [clusterData]);
+    // 🔥 Si hay un gráfico previo, lo destruimos ANTES de renderizar uno nuevo
+    if (chartRef.current) {
+      chartRef.current.destroy();
+      chartRef.current = null;
+    }
+  }, [clusterData]); // Se ejecuta CADA VEZ que cambie el clusterData
 
   if (isLoading)
     return <div className="loading">Cargando visualización...</div>;
@@ -55,7 +53,7 @@ export const ClusterVisualization = () => {
   ];
 
   const datasets = clusters.map((cluster, idx) => ({
-    label: cluster,
+    label: `Cluster ${cluster}`,
     data: clusterData.points
       .filter((p) => p.label === cluster)
       .map((p) => ({ x: p.x, y: p.y, title: p.title, category: p.category })),
@@ -81,7 +79,7 @@ export const ClusterVisualization = () => {
             return [
               `Título: ${point.title}`,
               `Categoría: ${point.category}`,
-              `Coordenadas: (${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(2)})`,
+              `(${context.parsed.x.toFixed(2)}, ${context.parsed.y.toFixed(2)})`,
             ];
           },
         },
